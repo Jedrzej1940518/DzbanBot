@@ -3,7 +3,7 @@ import random
 from datetime import datetime
 
 last_date = datetime.strptime("1/17/2023", "%m/%d/%Y")
-today_seconds = 36000
+today_seconds = 43200 #12 godzin
 
 def __won(row) -> bool:
     
@@ -53,7 +53,7 @@ def dzisiaj():
             timestamp = datetime.strptime(row['endDateTime'], "%Y-%m-%dT%H:%M:%SZ")
             diff = now - timestamp 
 
-            if diff.total_seconds() < today_seconds: #10 hours
+            if diff.total_seconds() < today_seconds:
                 
                 pointSum += __points(row)
 

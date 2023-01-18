@@ -54,7 +54,7 @@ class Bot(commands.Bot):
         [wins, loses, points] = getData.dzisiaj()
         emote = getData.emotePoints(points)
 
-        await ctx.send(f'Dzisiaj Dzban wygrał {wins}, przegrał {loses} {emote}')
+        await ctx.send(f'Dzisiaj Dzban wygrał {wins}, przegrał {loses}, punkty {points} {emote}')
 
 bot = Bot()
 bot.run()

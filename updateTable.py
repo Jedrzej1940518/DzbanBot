@@ -6,7 +6,7 @@ import json
 import datetime
 
 maxRangeToGet = 20 
-secondsBetweenUpdates = 300
+secondsBetweenUpdates = 600
 
 fieldnames = ['endDateTime', 'enemyName', 'hostName', 'durationInSeconds', 'ratingChange']
 
