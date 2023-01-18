@@ -45,7 +45,7 @@ class Bot(commands.Bot):
         [wins, loses] = getData.versus(opponent, withTime)
         emote = getData.emoteWins(wins, loses)
 
-        await ctx.send(f'Dzban vs. {opponent}: wygranych {wins}, przegranych {loses} {emote}')
+        await ctx.send(f'Stary vs. {opponent}: wygranych {wins}, przegranych {loses} {emote}')
 
     @commands.command()
     async def dzisiaj(self, ctx: commands.Context):
@@ -54,7 +54,15 @@ class Bot(commands.Bot):
         [wins, loses, points] = getData.dzisiaj()
         emote = getData.emotePoints(points)
 
-        await ctx.send(f'Dzisiaj Dzban wygrał {wins}, przegrał {loses}, punkty {points} {emote}')
+        await ctx.send(f'Dzisiaj Dzban wygrał {wins}, przegrał {loses}, punkty {points:+} {emote}')
+
+    @commands.command()
+    async def punkty(self, ctx: commands.Context):
+        
+        updateTable.updateTable()
+        [points, rank] = getData.getRating()
+
+        await ctx.send(f'Punkty Glusia: {points} => TOP {rank} HOTA peepoBlush')
 
 bot = Bot()
 bot.run()

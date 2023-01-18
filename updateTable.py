@@ -4,6 +4,8 @@ import requests
 import csv
 import json
 import datetime
+import re
+from bs4 import BeautifulSoup
 
 maxRangeToGet = 20 
 secondsBetweenUpdates = 600
@@ -28,6 +30,24 @@ def __timePassedBetweenUpdates():
     lastUpdateDatetime = datetime.datetime.strptime(lastUpdateString, "%m/%d/%Y, %H:%M:%S")
     now = datetime.datetime.now()
     return now - lastUpdateDatetime
+
+def __updatePoints():
+
+    print(f'getting points')
+    url = "https://h3score.com/players/profile?name=BiomHammer."
+    html = requests.get(url, verify=False).content
+    soup = BeautifulSoup(html, 'html.parser')
+
+    pointTag = soup.find(text = re.compile("Points \d+"))
+    points = re.search("\d+", pointTag).group(0)
+    
+    rankTag = soup.find(text = re.compile("Rank \d+"))
+    rank = re.search("\d+", rankTag).group(0)
+
+    
+    with open('points.txt', 'w') as f:
+        f.write('Points:'+points+'\n')
+        f.write('Rank:'+rank+'\n')
 
 def __getData(pageNum, size):
 
@@ -125,6 +145,7 @@ def updateTable():
     t = __timePassedBetweenUpdates()
     if t.total_seconds() < secondsBetweenUpdates:
         return 
-    
-    mergeTables()
+
     __updateWriteTime()
+    mergeTables()
+    __updatePoints()

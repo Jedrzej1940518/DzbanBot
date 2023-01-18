@@ -1,9 +1,11 @@
 import csv
 import random
+import re
 from datetime import datetime
 
-last_date = datetime.strptime("1/17/2023", "%m/%d/%Y")
-today_seconds = 43200 #12 godzin
+earliestRecording = datetime.strptime("1/17/2023", "%m/%d/%Y")
+dateFormat = "%Y-%m-%dT%H:%M:%SZ"
+todaySeconds = 43200 #12 godzin
 
 def __won(row) -> bool:
     
@@ -15,57 +17,71 @@ def __won(row) -> bool:
 def __points(row):
     return int(row['ratingChange'])
 
-def versus(opponent, withTime: bool):
+def __getWinsLosePoints(rows):
 
     wins = 0
     loses = 0
-    # Open the CSV file
+    pointSum = 0
+
+    for row in rows:
+
+        pointSum += __points(row)
+
+        if __won(row):
+            wins+=1
+        else:
+            loses+=1
+
+    return (wins, loses, pointSum)
+    
+
+def __getRows(earliestDate, latestDate):
+    
+    rowList = []
+
     with open('data.csv', 'r') as csvfile:
         reader = csv.DictReader(csvfile)
-
-        # Loop over the rows in the CSV file
+        
         for row in reader:
-
             timestamp = datetime.strptime(row['endDateTime'], "%Y-%m-%dT%H:%M:%SZ")
             
-            if withTime and timestamp < last_date:
-                return (wins, loses)
+            if timestamp < earliestDate or timestamp > latestDate:
+                return rowList
+            if timestamp > earliestDate and timestamp < latestDate:
+                rowList.append(row)
+    
+    return rowList
 
-            if row['enemyName'].casefold() == opponent.casefold():
-                if __won(row):
-                    wins += 1
-                else:
-                    loses +=1
+
+def versus(opponent):
+
+    rows = __getRows(earliestRecording, datetime.now())
+    rowsVersus = [row for row in rows if row['enemyName'].casefold() == opponent.casefold()]
+    
+    [wins, loses, ] =__getWinsLosePoints(rowsVersus)
 
     return (wins, loses)
 
 def dzisiaj():
     
-    wins = 0 
-    loses = 0
-    pointSum = 0
-
-    with open('data.csv', 'r') as csvfile:
-        reader = csv.DictReader(csvfile)
-        now = datetime.now()
-        
-        for row in reader:
-            timestamp = datetime.strptime(row['endDateTime'], "%Y-%m-%dT%H:%M:%SZ")
-            diff = now - timestamp 
-
-            if diff.total_seconds() < today_seconds:
-                
-                pointSum += __points(row)
-
-                if __won(row):
-                    wins+=1
-                else:
-                    loses+=1
-            else:
-                return (wins, loses, pointSum)
+    
+    earliestDate = datetime.now() - todaySeconds
+    rows = __getRows(earliestDate, datetime.now())
+    
+    [wins, loses, pointSum] = __getWinsLosePoints(rows)
     
     return (wins, loses, pointSum)
 
+def getRating():
+
+    with open('points.txt', 'r') as f:
+        pointsLine = f.readline()
+        points = re.search('(Points:)(\d+)', pointsLine).group(2)
+        rankLine = f.readline()
+        rank = re.search('(Rank:)(\d+)', rankLine).group(2)
+        return (points, rank)
+
+    pass
 
 def negativeEmote():
     negativeEmotes = ['classic', 'Pain', 'depresso', 'xddinside', 'xddWalk', 'PepeHands', 'AYAYAS']
