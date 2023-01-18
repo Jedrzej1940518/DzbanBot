@@ -1,7 +1,7 @@
 import csv
 import random
 import re
-from datetime import datetime
+from datetime import datetime, timedelta
 
 earliestRecording = datetime.strptime("1/17/2023", "%m/%d/%Y")
 dateFormat = "%Y-%m-%dT%H:%M:%SZ"
@@ -65,7 +65,7 @@ def versus(opponent):
 def dzisiaj():
     
     
-    earliestDate = datetime.now() - todaySeconds
+    earliestDate = datetime.now() - timedelta(seconds=todaySeconds)
     rows = __getRows(earliestDate, datetime.now())
     
     [wins, loses, pointSum] = __getWinsLosePoints(rows)
