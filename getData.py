@@ -58,7 +58,7 @@ def versus(opponent):
     rows = __getRows(earliestRecording, datetime.now())
     rowsVersus = [row for row in rows if row['enemyName'].casefold() == opponent.casefold()]
     
-    [wins, loses, ] =__getWinsLosePoints(rowsVersus)
+    [wins, loses, _] =__getWinsLosePoints(rowsVersus)
 
     return (wins, loses)
 

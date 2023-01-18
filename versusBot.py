@@ -1,7 +1,6 @@
 from twitchio.ext import commands
 import getData
 import updateTable
-import os
 
 authToken = os.environ['authToken']
 
@@ -41,8 +40,7 @@ class Bot(commands.Bot):
         updateTable.updateTable()
         splitted = ctx.message.content.split(' ')
         opponent = splitted[1]
-        withTime = True
-        [wins, loses] = getData.versus(opponent, withTime)
+        [wins, loses] = getData.versus(opponent)
         emote = getData.emoteWins(wins, loses)
 
         await ctx.send(f'Stary vs. {opponent}: wygranych {wins}, przegranych {loses} {emote}')
