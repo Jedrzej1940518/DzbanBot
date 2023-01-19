@@ -5,12 +5,12 @@ import csv
 import json
 import datetime
 import re
+import logging
 from bs4 import BeautifulSoup
 
-maxRangeToGet = 20 
-secondsBetweenUpdates = 600
-
-fieldnames = ['endDateTime', 'enemyName', 'hostName', 'durationInSeconds', 'ratingChange']
+__maxRangeToGet = 20 
+__secondsBetweenUpdates = 300 #5 minutes
+__fieldnames = ['endDateTime', 'enemyName', 'hostName', 'durationInSeconds', 'ratingChange']
 
 def __getLastWriteTime():
 
@@ -31,25 +31,29 @@ def __timePassedBetweenUpdates():
     now = datetime.datetime.now()
     return now - lastUpdateDatetime
 
-def __updatePoints():
+def __getPointsData():
 
     print(f'getting points')
+     
     url = "https://h3score.com/players/profile?name=BiomHammer."
     html = requests.get(url, verify=False).content
     soup = BeautifulSoup(html, 'html.parser')
+    
+    return soup
+
+def __updatePoints(soup):
 
     pointTag = soup.find(text = re.compile("Points \d+"))
     points = re.search("\d+", pointTag).group(0)
     
     rankTag = soup.find(text = re.compile("Rank \d+"))
     rank = re.search("\d+", rankTag).group(0)
-
     
     with open('points.txt', 'w') as f:
         f.write('Points:'+points+'\n')
         f.write('Rank:'+rank+'\n')
 
-def __getData(pageNum, size):
+def __getMatchData(pageNum, size):
 
         print(f'getting data: {pageNum}, {size}')
         url = f'https://h3score.com/players/data/lastGameResults?playerName=BiomHammer.&page={pageNum}&size={size}'
@@ -58,24 +62,6 @@ def __getData(pageNum, size):
         dataItems = data['data']
         return dataItems
 
-
-def __createTable():
-
-    numberOfGames = int(input("How many games you want to get? "))
-    if numberOfGames > 1000:
-        print("error! too many games")
-        exit()
-
-    data_items = __getData(1, numberOfGames)
-
-    with open('data.csv', 'w', newline='') as csvfile:
-        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-
-        writer.writeheader()
-        for item in data_items:
-            writer.writerow(item)
-
-    __updateWriteTime()
 
 def __getFirstRow():
     
@@ -95,12 +81,12 @@ def __getDataNeeded():
     range = 10
     dataNeeded = []
 
-    while page*range <= maxRangeToGet:
+    while page*range <= __maxRangeToGet:
 
-        data_items = __getData(page, range)
+        data_items = __getMatchData(page, range)
 
         for item in data_items:
-            if itemInRowCsv(firstRow, item):
+            if __itemInRowCsv(firstRow, item):
                 return dataNeeded
             dataNeeded.append(item)
 
@@ -109,15 +95,13 @@ def __getDataNeeded():
     return dataNeeded
 
 
-def mergeTables():
-
-    data_items = __getDataNeeded()
+def __mergeTables(neededData):
 
     with open('new_data.csv', 'w', newline='') as csvfile:
-        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+        writer = csv.DictWriter(csvfile, fieldnames=__fieldnames)
         writer.writeheader()
 
-        for item in data_items:
+        for item in neededData:
             writer.writerow(item)
 
         with open('data.csv', 'r', newline='') as oldFile:
@@ -128,24 +112,46 @@ def mergeTables():
     os.remove('old_data.csv')
     os.rename('data.csv', 'old_data.csv')
     os.rename('new_data.csv', 'data.csv')
-
-
  
-def itemInRowCsv(row, item):
+def __itemInRowCsv(row, item):
 
     if row['endDateTime'] == item['endDateTime'] and row['enemyName'] == item['enemyName'] and row['hostName'] == item['hostName']:
         return True
 
     return False
 
+def __createTable():
 
+    numberOfGames = int(input("How many games you want to get? "))
+    if numberOfGames > 1000:
+        print("error! too many games")
+        exit()
+
+    matchData = __getMatchData(1, numberOfGames)
+
+    with open('data.csv', 'w', newline='') as csvfile:
+        writer = csv.DictWriter(csvfile, fieldnames=__fieldnames)
+
+        writer.writeheader()
+        for item in matchData:
+            writer.writerow(item)
+
+    __updateWriteTime()
 
 def updateTable():
         
     t = __timePassedBetweenUpdates()
-    if t.total_seconds() < secondsBetweenUpdates:
+    if t.total_seconds() < __secondsBetweenUpdates:
         return 
 
     __updateWriteTime()
-    mergeTables()
-    __updatePoints()
+
+    try:
+        neededData = __getDataNeeded()
+        soup = __getPointsData()
+    except Exception as e:
+        logging.error(f'Error while getting data {e}')
+        return
+
+    __mergeTables(neededData)
+    __updatePoints(soup)

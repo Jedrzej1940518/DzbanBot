@@ -3,9 +3,9 @@ import random
 import re
 from datetime import datetime, timedelta
 
-earliestRecording = datetime.strptime("1/17/2023", "%m/%d/%Y")
-dateFormat = "%Y-%m-%dT%H:%M:%SZ"
-todaySeconds = 43200 #12 godzin
+__earliestRecording = datetime.strptime("1/17/2023", "%m/%d/%Y")
+__dateFormat = "%Y-%m-%dT%H:%M:%SZ"
+__todaySeconds = 43200 #12 godzin
 
 def __won(row) -> bool:
     
@@ -35,7 +35,7 @@ def __getWinsLosePoints(rows):
     return (wins, loses, pointSum)
     
 
-def __getRows(earliestDate, latestDate):
+def __getRowsByTime(earliestTime, lastestTime):
     
     rowList = []
 
@@ -43,11 +43,28 @@ def __getRows(earliestDate, latestDate):
         reader = csv.DictReader(csvfile)
         
         for row in reader:
-            timestamp = datetime.strptime(row['endDateTime'], "%Y-%m-%dT%H:%M:%SZ")
+            timestamp = datetime.strptime(row['endDateTime'], __dateFormat)
             
-            if timestamp < earliestDate or timestamp > latestDate:
+            if timestamp < earliestTime or timestamp > lastestTime:
                 return rowList
-            if timestamp > earliestDate and timestamp < latestDate:
+            if timestamp > earliestTime and timestamp < lastestTime:
+                rowList.append(row)
+    
+    return rowList
+
+def __getRowsByDate(date):
+
+    rowList = []
+
+    with open('data.csv', 'r') as csvfile:
+        reader = csv.DictReader(csvfile)
+        
+        for row in reader:
+            dateRow = datetime.strptime(row['endDateTime'], __dateFormat).date()
+            
+            if dateRow < date:
+                return rowList
+            elif dateRow == date:
                 rowList.append(row)
     
     return rowList
@@ -55,7 +72,7 @@ def __getRows(earliestDate, latestDate):
 
 def versus(opponent):
 
-    rows = __getRows(earliestRecording, datetime.now())
+    rows = __getRowsByTime(__earliestRecording, datetime.now())
     rowsVersus = [row for row in rows if row['enemyName'].casefold() == opponent.casefold()]
     
     [wins, loses, _] =__getWinsLosePoints(rowsVersus)
@@ -64,12 +81,18 @@ def versus(opponent):
 
 def dzisiaj():
     
-    
-    earliestDate = datetime.now() - timedelta(seconds=todaySeconds)
-    rows = __getRows(earliestDate, datetime.now())
-    
+    todaysDate = datetime.now().date()
+    rows = __getRowsByDate(todaysDate)
     [wins, loses, pointSum] = __getWinsLosePoints(rows)
     
+    return (wins, loses, pointSum)
+
+def wczoraj():
+
+    yesterdayDate = datetime.now().date() - timedelta(days=1)
+    rows = __getRowsByDate(yesterdayDate)
+    [wins, loses, pointSum] = __getWinsLosePoints(rows)
+
     return (wins, loses, pointSum)
 
 def getRating():
@@ -110,3 +133,5 @@ def emoteWins(wins, loses):
         return negativeEmote()
     else:
         return neutralEmote()
+
+wczoraj()
