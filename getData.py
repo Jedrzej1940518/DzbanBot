@@ -133,5 +133,3 @@ def emoteWins(wins, loses):
         return negativeEmote()
     else:
         return neutralEmote()
-
-wczoraj()
