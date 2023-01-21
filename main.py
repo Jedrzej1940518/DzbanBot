@@ -1,31 +1,44 @@
 import versusBot
 import sys
+import os
+import logging
 
-__channelName = 'Gluhammer'
-__channelId = 36912126
+authToken = os.environ['authToken']
 
-__debugChannelName = 'szalony_jedrzej'
-__debugChannelId = 133916932
+botOwner = 'szalony_jedrzej'
+initialChannels = ['Gluhammer']
+debugChannels = ['szalony_jedrzej']
+
 
 def debug():
-    print("debugging start")
-    bot = versusBot.Bot(__debugChannelName, __debugChannelId)
+    logging.info("debugging start")
+    bot = versusBot.Bot(botOwner, authToken, debugChannels)
     bot.run()
+
 
 def release():
-    print("realse start")
-    bot = versusBot.Bot(__channelName, __channelId)
+    logging.info("realse start")
+    bot = versusBot.Bot(botOwner, authToken, initialChannels)
     bot.run()
 
+
 def main():
+
+    logging.basicConfig(filename='logs.log',
+                        encoding='utf-8',
+                        level=logging.INFO,
+                        format='%(asctime)s.%(msecs)03d %(levelname)s %(module)s - %(funcName)s: %(message)s',
+                        datefmt='%Y-%m-%d %H:%M:%S')
+
     args = sys.argv
     print(f'args = {args}')
-    
+
     if len(args) > 1:
         if args[1] == '--release':
             release()
             return
-   
+
     debug()
+
 
 main()

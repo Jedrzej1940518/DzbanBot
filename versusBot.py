@@ -2,21 +2,20 @@ from twitchio.ext import commands
 import getData
 import updateTable
 import logging
-import os
-
-authToken = os.environ['authToken']
 
 class Bot(commands.Bot):
 
-    def __init__(self, channelName, channelId):
-        self.channelName = channelName
-        self.channelId = channelId 
-        super().__init__(token=authToken, prefix='!', initial_channels=[self.channelName])
+    def __init__(self, botOwner, authToken, initialChannels):
+        self.initialChannels = initialChannels
+        self.botOwner = botOwner
+        super().__init__(token=authToken, prefix='!', initial_channels=self.initialChannels)
 
     async def event_ready(self):
 
-        print(f'Logged in as | {self.nick}')
-        print(f'User id is | {self.user_id}')
+        logging.info(f'Logged in as | {self.nick}')
+        logging.info(f'User id is | {self.user_id}')
+        logging.info("Ready on channels:" + str(self.initialChannels))
+
         updateTable.updateTable()
 
     async def event_message(self, message):

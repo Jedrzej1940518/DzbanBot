@@ -2,20 +2,22 @@ import csv
 import random
 import re
 from datetime import datetime, timedelta
+from updateTable import dateFormat
 
 __earliestRecording = datetime.strptime("1/17/2023", "%m/%d/%Y")
-__dateFormat = "%Y-%m-%dT%H:%M:%SZ"
-__todaySeconds = 43200 #12 godzin
+
 
 def __won(row) -> bool:
-    
+
     if int(row['ratingChange']) > 0:
         return True
 
     return False
 
+
 def __points(row):
     return int(row['ratingChange'])
+
 
 def __getWinsLosePoints(rows):
 
@@ -28,29 +30,30 @@ def __getWinsLosePoints(rows):
         pointSum += __points(row)
 
         if __won(row):
-            wins+=1
+            wins += 1
         else:
-            loses+=1
+            loses += 1
 
     return (wins, loses, pointSum)
-    
+
 
 def __getRowsByTime(earliestTime, lastestTime):
-    
+
     rowList = []
 
     with open('data.csv', 'r') as csvfile:
         reader = csv.DictReader(csvfile)
-        
+
         for row in reader:
-            timestamp = datetime.strptime(row['endDateTime'], __dateFormat)
-            
+            timestamp = datetime.strptime(row['endDateTime'], dateFormat)
+
             if timestamp < earliestTime or timestamp > lastestTime:
                 return rowList
             if timestamp > earliestTime and timestamp < lastestTime:
                 rowList.append(row)
-    
+
     return rowList
+
 
 def __getRowsByDate(date):
 
@@ -58,34 +61,38 @@ def __getRowsByDate(date):
 
     with open('data.csv', 'r') as csvfile:
         reader = csv.DictReader(csvfile)
-        
+
         for row in reader:
-            dateRow = datetime.strptime(row['endDateTime'], __dateFormat).date()
-            
+            dateRow = datetime.strptime(
+                row['endDateTime'], dateFormat).date()
+
             if dateRow < date:
                 return rowList
             elif dateRow == date:
                 rowList.append(row)
-    
+
     return rowList
 
 
 def versus(opponent):
 
     rows = __getRowsByTime(__earliestRecording, datetime.now())
-    rowsVersus = [row for row in rows if row['enemyName'].casefold() == opponent.casefold()]
-    
-    [wins, loses, _] =__getWinsLosePoints(rowsVersus)
+    rowsVersus = [row for row in rows if row['enemyName'].casefold()
+                  == opponent.casefold()]
+
+    [wins, loses, _] = __getWinsLosePoints(rowsVersus)
 
     return (wins, loses)
 
+
 def dzisiaj():
-    
+
     todaysDate = datetime.now().date()
     rows = __getRowsByDate(todaysDate)
     [wins, loses, pointSum] = __getWinsLosePoints(rows)
-    
+
     return (wins, loses, pointSum)
+
 
 def wczoraj():
 
@@ -94,6 +101,7 @@ def wczoraj():
     [wins, loses, pointSum] = __getWinsLosePoints(rows)
 
     return (wins, loses, pointSum)
+
 
 def getRating():
 
@@ -106,17 +114,23 @@ def getRating():
 
     pass
 
+
 def negativeEmote():
-    negativeEmotes = ['classic', 'Pain', 'depresso', 'xddinside', 'xddWalk', 'PepeHands', 'AYAYAS']
+    negativeEmotes = ['classic', 'Pain', 'depresso',
+                      'xddinside', 'xddWalk', 'PepeHands', 'AYAYAS']
     return random.choice(negativeEmotes)
 
+
 def positiveEmote():
-    positiveEmotes = ['leosiaKiss', 'fifka', 'leosiaJAM', 'pajac', 'AYAYASmile', 'WICKED', 'PagMan']
+    positiveEmotes = ['leosiaKiss', 'fifka', 'leosiaJAM',
+                      'pajac', 'AYAYASmile', 'WICKED', 'PagMan']
     return random.choice(positiveEmotes)
+
 
 def neutralEmote():
     neutralEmotes = ['HUH', 'hmjj']
     return random.choice(neutralEmotes)
+
 
 def emotePoints(points):
     if points > 0:
@@ -125,7 +139,8 @@ def emotePoints(points):
         return negativeEmote()
     else:
         return neutralEmote()
-    
+
+
 def emoteWins(wins, loses):
     if wins > loses:
         return positiveEmote()

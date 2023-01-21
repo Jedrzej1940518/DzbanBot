@@ -8,64 +8,87 @@ import re
 import logging
 from bs4 import BeautifulSoup
 
-__maxRangeToGet = 20 
-__secondsBetweenUpdates = 300 #5 minutes
-__fieldnames = ['endDateTime', 'enemyName', 'hostName', 'durationInSeconds', 'ratingChange']
+dateFormat = "%Y-%m-%dT%H:%M:%SZ"
+
+fieldnames = ['endDateTime', 'enemyName',
+              'hostName', 'durationInSeconds', 'ratingChange']
+
+__maxRangeToGet = 20
+__secondsBetweenUpdates = 300  # 5 minutes
+
+
+def __updateInternalData(fieldName, newValue):
+
+    with open('internalData.json', 'r') as file:
+        data = json.load(file)
+
+    data[fieldName] = newValue
+
+    with open('internalData.json', 'w') as file:
+        json.dump(data, file)
+
 
 def __getLastWriteTime():
 
-    with open('internalData.txt', 'r') as file:
-        time = file.readline()
-        return time
+    with open('internalData.json', 'r') as file:
+        data = json.load(file)
+        return data["LastUpdate"]
+
 
 def __updateWriteTime():
-    
+
     now = datetime.datetime.now()
-    date_time = now.strftime("%m/%d/%Y, %H:%M:%S")
-    with open('internalData.txt', 'w') as file:
-        file.write(date_time)
+    updateTime = now.strftime(dateFormat)
+
+    __updateInternalData("LastUpdate", updateTime)
+
 
 def __timePassedBetweenUpdates():
     lastUpdateString = __getLastWriteTime()
-    lastUpdateDatetime = datetime.datetime.strptime(lastUpdateString, "%m/%d/%Y, %H:%M:%S")
+    lastUpdateDatetime = datetime.datetime.strptime(
+        lastUpdateString, dateFormat)
+
     now = datetime.datetime.now()
     return now - lastUpdateDatetime
 
+
 def __getPointsData():
 
-    print(f'getting points')
-     
+    logging.info(f'getting points')
+
     url = "https://h3score.com/players/profile?name=BiomHammer."
     html = requests.get(url, verify=False).content
     soup = BeautifulSoup(html, 'html.parser')
-    
+
     return soup
+
 
 def __updatePoints(soup):
 
-    pointTag = soup.find(text = re.compile("Points \d+"))
+    pointTag = soup.find(text=re.compile("Points \d+"))
     points = re.search("\d+", pointTag).group(0)
-    
-    rankTag = soup.find(text = re.compile("Rank \d+"))
+
+    __updateInternalData("Points", points)
+
+    rankTag = soup.find(text=re.compile("Rank \d+"))
     rank = re.search("\d+", rankTag).group(0)
-    
-    with open('points.txt', 'w') as f:
-        f.write('Points:'+points+'\n')
-        f.write('Rank:'+rank+'\n')
+
+    __updateInternalData("Rank", rank)
+
 
 def __getMatchData(pageNum, size):
 
-        print(f'getting data: {pageNum}, {size}')
-        url = f'https://h3score.com/players/data/lastGameResults?playerName=BiomHammer.&page={pageNum}&size={size}'
-        html = requests.get(url, verify=False).content
-        data = json.loads(html)
-        dataItems = data['data']
-        return dataItems
+    logging.info(f'getting data: {pageNum}, {size}')
+    url = f'https://h3score.com/players/data/lastGameResults?playerName=BiomHammer.&page={pageNum}&size={size}'
+    html = requests.get(url, verify=False).content
+    data = json.loads(html)
+    dataItems = data['data']
+    return dataItems
 
 
 def __getFirstRow():
-    
-    with open('data.csv', 'r') as csvfile:
+
+    with open('data.json', 'r') as file:
         reader = csv.DictReader(csvfile)
 
         try:
@@ -76,7 +99,7 @@ def __getFirstRow():
 
 def __getDataNeeded():
 
-    firstRow = __getFirstRow()
+    lastMatch = __getLastMatch()
     page = 1
     range = 10
     dataNeeded = []
@@ -90,7 +113,7 @@ def __getDataNeeded():
                 return dataNeeded
             dataNeeded.append(item)
 
-        page +=1
+        page += 1
 
     return dataNeeded
 
@@ -98,7 +121,7 @@ def __getDataNeeded():
 def __mergeTables(neededData):
 
     with open('new_data.csv', 'w', newline='') as csvfile:
-        writer = csv.DictWriter(csvfile, fieldnames=__fieldnames)
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writeheader()
 
         for item in neededData:
@@ -108,11 +131,12 @@ def __mergeTables(neededData):
             reader = csv.DictReader(oldFile)
             for row in reader:
                 writer.writerow(row)
-            
+
     os.remove('old_data.csv')
     os.rename('data.csv', 'old_data.csv')
     os.rename('new_data.csv', 'data.csv')
- 
+
+
 def __itemInRowCsv(row, item):
 
     if row['endDateTime'] == item['endDateTime'] and row['enemyName'] == item['enemyName'] and row['hostName'] == item['hostName']:
@@ -120,17 +144,18 @@ def __itemInRowCsv(row, item):
 
     return False
 
+
 def __createTable():
 
     numberOfGames = int(input("How many games you want to get? "))
     if numberOfGames > 1000:
-        print("error! too many games")
+        logging.info("error! too many games")
         exit()
 
     matchData = __getMatchData(1, numberOfGames)
 
     with open('data.csv', 'w', newline='') as csvfile:
-        writer = csv.DictWriter(csvfile, fieldnames=__fieldnames)
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
 
         writer.writeheader()
         for item in matchData:
@@ -138,11 +163,12 @@ def __createTable():
 
     __updateWriteTime()
 
+
 def updateTable():
-        
+
     t = __timePassedBetweenUpdates()
     if t.total_seconds() < __secondsBetweenUpdates:
-        return 
+        return
 
     __updateWriteTime()
 
@@ -155,3 +181,21 @@ def updateTable():
 
     __mergeTables(neededData)
     __updatePoints(soup)
+
+
+def jsonTesting():
+
+
+    with open('jsonTest.json', 'r') as file:
+        data = json.load(file)
+    
+    for record in data:
+        print(record)
+
+    
+    with open("jsonTest.json", "r") as file:
+        first_line = file.readline()
+        print(first_line)
+
+
+jsonTesting()
