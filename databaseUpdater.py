@@ -9,7 +9,7 @@ from bs4 import BeautifulSoup
 
 class DatabaseUpdater:
 
-    __maxRangeToGet = 10
+    __maxRangeToGet = 20
     __secondsBetweenUpdates = 300
     
     def __init__(self, dbWrapper):
