@@ -1,17 +1,17 @@
 from twitchio.ext import commands
-from  databaseWrapper import DatabaseWrapper
-from  databaseUpdater import DatabaseUpdater
-from  commandExecuter import CommandExecuter
+from databaseWrapper import DatabaseWrapper
+from databaseUpdater import DatabaseUpdater
+from commandExecuter import CommandExecuter
 from messages import *
 import logging
 
 
 def prepAndGetCommandExecuter(channel, update=True):
     channelName = channel.name
-    dbWrapper = DatabaseWrapper(channelName)    
+    dbWrapper = DatabaseWrapper(channelName)
     dbUpdater = DatabaseUpdater(dbWrapper)
     dbUpdater.updateDatabase()
-        
+
     commandExecuter = CommandExecuter(channel, dbWrapper)
 
     return commandExecuter
@@ -34,14 +34,14 @@ class Bot(commands.Bot):
 
         if message.echo:
             return
-           
+
         await self.handle_commands(message)
 
     @commands.command()
     async def versus(self, ctx: commands.Context):
 
-        try:         
-            executer = prepAndGetCommandExecuter(ctx.channel)    
+        try:
+            executer = prepAndGetCommandExecuter(ctx.channel)
         except Exception as e:
             logging.error(e)
             return
@@ -49,45 +49,45 @@ class Bot(commands.Bot):
         splitted = ctx.message.content.split(' ')
         opponent = splitted[1]
 
-        await ctx.send(executer.versus(opponent))   
+        await ctx.send(executer.versus(opponent))
 
     @commands.command()
     async def dzisiaj(self, ctx: commands.Context):
-        
-        try:         
+
+        try:
             executer = prepAndGetCommandExecuter(ctx.channel)
         except Exception as e:
             logging.error(e)
             return
-        
+
         await ctx.send(executer.dzisiaj())
 
     @commands.command()
     async def wczoraj(self, ctx: commands.Context):
 
-        try:         
+        try:
             executer = prepAndGetCommandExecuter(ctx.channel)
         except Exception as e:
             logging.error(e)
             return
 
         await ctx.send(executer.wczoraj())
-        
+
     @commands.command()
     async def dzisiaj_detale(self, ctx: commands.Context):
 
-        try:         
+        try:
             executer = prepAndGetCommandExecuter(ctx.channel)
         except Exception as e:
             logging.error(e)
             return
 
         await ctx.send(executer.dzisiaj_detale())
-    
+
     @commands.command()
     async def wczoraj_detale(self, ctx: commands.Context):
 
-        try:         
+        try:
             executer = prepAndGetCommandExecuter(ctx.channel)
         except Exception as e:
             logging.error(e)
@@ -97,32 +97,37 @@ class Bot(commands.Bot):
 
     @commands.command()
     async def punkty(self, ctx: commands.Context):
-        
-        try:         
+
+        try:
             executer = prepAndGetCommandExecuter(ctx.channel)
         except Exception as e:
             logging.error(e)
             return
-        
+
         await ctx.send(executer.punkty())
+
+    @commands.command()
+    async def jutro(self, ctx: commands.Context):
+        await ctx.send('Jutro będzie futro widzu LIKE')
         
     @commands.command()
     async def konto(self, ctx: commands.Context):
 
         if not (ctx.author.is_mod or ctx.author.is_broadcaster or (ctx.author.name == self.botOwner)):
             return
-        
-        try:         
+
+        try:
             channelName = ctx.channel.name
-            dbWrapper = DatabaseWrapper(channelName)    
+            dbWrapper = DatabaseWrapper(channelName)
             executer = CommandExecuter(channelName, dbWrapper)
             splitted = ctx.message.content.split(' ')
-            newActiveAccount = splitted[1] 
-            
+            newActiveAccount = splitted[1]
+
             dbWrapper.updateActiveAccount(newActiveAccount)
             dbUpdater = DatabaseUpdater(dbWrapper)
             dbUpdater.updateDatabase()
-            dbUpdater.updatePoints(newActiveAccount) #updating points always, so ppl see correct rank when changing accounts
+            # updating points always, so ppl see correct rank when changing accounts
+            dbUpdater.updatePoints(newActiveAccount)
 
         except Exception as e:
             await ctx.send(onFailedAccountSwap(newActiveAccount))
@@ -130,4 +135,3 @@ class Bot(commands.Bot):
             return
 
         await ctx.send(executer.konto(newActiveAccount))
-        
