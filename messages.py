@@ -25,6 +25,9 @@ def updateAccountMsg(newActiveAccount, points, rating):
 def onFailedAccountSwap(newActiveAccount):
     return (f'Nie udało się przełączyć konta na {newActiveAccount} AYAYAS Wielkość liter ma znaczenie! Wpisałeś poprawnie? peepoBlush')
 
+def detailedMatch(enemyName, wins, loses):
+    return (f'{wins}-{loses} {enemyName} {emoteWins(wins,loses)} ')
+
 def negativeEmote():
     negativeEmotes = ['classic', 'Pain', 'depresso',
                       'xddinside', 'xddWalk', 'PepeHands', 'AYAYAS']

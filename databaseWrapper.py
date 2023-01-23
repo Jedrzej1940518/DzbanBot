@@ -2,6 +2,7 @@
 
 import MySQLdb
 import datetime
+from collections import defaultdict
 
 # Internal data:
 # channel   active_account  points  rank    last_update
@@ -12,6 +13,17 @@ import datetime
 # match fieldnames = ['endDateTime', 'enemyName',
 #                      'hostName', 'durationInSeconds', 'ratingChange']
 
+
+class MatchHistoryObject:
+
+    def __init__(self, row):
+        self.account_name = row[0]
+        self.end_date_time = row[1]
+        self.end_date = row[2]
+        self.enemy_name = row[3]
+        self.host_name = row[4]
+        self.duration_in_seconds = row[5]
+        self.rating_change = row[6]
 
 class DatabaseWrapper:
 
@@ -119,6 +131,28 @@ class DatabaseWrapper:
             """SELECT SUM(rating_change) FROM Match_History WHERE account_name = %s AND end_date = %s""", (acc, date,))
 
         return (wins or 0, loses or 0, points or 0)
+    
+    def getDetailedDate(self, date):
+        acc = self.getActiveAccount()
+
+        self.c.execute(
+            """SELECT * FROM Match_History WHERE account_name = %s AND end_date = %s""", (acc, date))
+
+        d = defaultdict(list) 
+
+        for row in self.c.fetchall():
+            m = MatchHistoryObject(row)
+            d[m.enemy_name].append(m.rating_change )
+
+        res = {}
+        
+        for k, v in d.items():
+    
+            wins = sum(1 if rating_change > 0 else 0 for rating_change in v)
+            loses = sum(1 if rating_change < 0 else 0 for rating_change in v)
+            res[k] = (wins, loses)
+                
+        return res
 
     def getPointsAndRank(self):
 

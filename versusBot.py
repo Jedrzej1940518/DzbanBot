@@ -34,7 +34,7 @@ class Bot(commands.Bot):
 
         if message.echo:
             return
-        
+           
         await self.handle_commands(message)
 
     @commands.command()
@@ -49,7 +49,7 @@ class Bot(commands.Bot):
         splitted = ctx.message.content.split(' ')
         opponent = splitted[1]
 
-        await ctx.send(executer.versus(opponent))
+        await ctx.send(executer.versus(opponent))   
 
     @commands.command()
     async def dzisiaj(self, ctx: commands.Context):
@@ -72,6 +72,28 @@ class Bot(commands.Bot):
             return
 
         await ctx.send(executer.wczoraj())
+        
+    @commands.command()
+    async def dzisiaj_detale(self, ctx: commands.Context):
+
+        try:         
+            executer = prepAndGetCommandExecuter(ctx.channel)
+        except Exception as e:
+            logging.error(e)
+            return
+
+        await ctx.send(executer.dzisiaj_detale())
+    
+    @commands.command()
+    async def wczoraj_detale(self, ctx: commands.Context):
+
+        try:         
+            executer = prepAndGetCommandExecuter(ctx.channel)
+        except Exception as e:
+            logging.error(e)
+            return
+
+        await ctx.send(executer.wczoraj_detale())
 
     @commands.command()
     async def punkty(self, ctx: commands.Context):
@@ -87,7 +109,7 @@ class Bot(commands.Bot):
     @commands.command()
     async def konto(self, ctx: commands.Context):
 
-        if not (ctx.author.is_mod or ctx.author.is_broadcaster):
+        if not (ctx.author.is_mod or ctx.author.is_broadcaster or (ctx.author.name == self.botOwner)):
             return
         
         try:         

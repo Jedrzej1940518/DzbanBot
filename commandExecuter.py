@@ -30,6 +30,22 @@ class CommandExecuter:
 
         return yesterdayMsg(self.accountName, wins, loses, pointSum)
 
+    def dzisiaj_detale(self):
+        todaysDate = datetime.now().date()
+        results = self.db.getDetailedDate(todaysDate)
+        msg = ""
+        for enemy_name, [wins, loses] in results.items():
+            msg += detailedMatch(enemy_name, wins, loses)
+        return msg
+    
+    def wczoraj_detale(self):
+        yesterdayDate = datetime.now().date() - timedelta(days = 1)
+        results = self.db.getDetailedDate(yesterdayDate)
+        msg = ""
+        for enemy_name, [wins, loses] in results.items():
+            msg += detailedMatch(enemy_name, wins, loses)
+        return msg
+        
     def konto(self, newActiveAccount):
         [points, rating]  = self.db.getPointsAndRank()
         return updateAccountMsg(newActiveAccount, points, rating)
