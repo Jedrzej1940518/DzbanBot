@@ -1,5 +1,6 @@
 import random
 
+
 def todayMsg(accountName, wins, loses, points):
     emote = emotePoints(points)
     return (f'Dzisiaj {accountName} wygrał {wins}, przegrał {loses}, punkty {points:+} {emote}')
@@ -22,11 +23,24 @@ def versusMsg(accountName, wins, loses, opponent):
 def updateAccountMsg(newActiveAccount, points, rating):
     return (f'Aktywne konto to teraz {newActiveAccount} - Punkty {points}, Top {rating} Hota AYAYASmile')
 
-def onFailedAccountSwap(newActiveAccount):
+
+def onFailedAccountSwapMsg(newActiveAccount):
     return (f'Nie udało się przełączyć konta na {newActiveAccount} AYAYAS Wielkość liter ma znaczenie! Wpisałeś poprawnie? peepoBlush')
 
-def detailedMatch(enemyName, wins, loses):
+
+def detailedMatchMsg(enemyName, wins, loses):
     return (f'{wins}-{loses} {enemyName} {emoteWins(wins,loses)} ')
+
+
+def lastMatchMsg(match):
+    wins = int(int(match.rating_change) > 0)
+    loses = int(int(match.rating_change) < 0)
+    enemyName = match.enemy_name
+    hour = match.end_date_time.hour
+    minutes = match.end_date_time.minute
+
+    return (f'Ostatni mecz zakończył się: {hour}:{minutes} {wins}-{loses} {enemyName} {emoteWins(wins,loses)} ')
+
 
 def negativeEmote():
     negativeEmotes = ['classic', 'Pain', 'depresso',

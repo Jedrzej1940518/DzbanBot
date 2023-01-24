@@ -1,12 +1,12 @@
 import random
 
 from datetime import datetime, timedelta
-import databaseWrapper
+from databaseWrapper import DatabaseWrapper
 from messages import *
 
 class CommandExecuter:
 
-    def __init__(self, channel, dbWrapper):
+    def __init__(self, channel, dbWrapper: DatabaseWrapper):
         self.db = dbWrapper
         self.accountName = self.db.getActiveAccount()
         self.channel = channel
@@ -35,7 +35,7 @@ class CommandExecuter:
         results = self.db.getDetailedDate(todaysDate)
         msg = ""
         for enemy_name, [wins, loses] in results.items():
-            msg += detailedMatch(enemy_name, wins, loses)
+            msg += detailedMatchMsg(enemy_name, wins, loses)
         return msg
     
     def wczoraj_detale(self):
@@ -43,7 +43,7 @@ class CommandExecuter:
         results = self.db.getDetailedDate(yesterdayDate)
         msg = ""
         for enemy_name, [wins, loses] in results.items():
-            msg += detailedMatch(enemy_name, wins, loses)
+            msg += detailedMatchMsg(enemy_name, wins, loses)
         return msg
         
     def konto(self, newActiveAccount):
@@ -53,3 +53,7 @@ class CommandExecuter:
     def punkty(self):
         [points, _]  = self.db.getPointsAndRank()
         return pointsMsg(self.accountName, points)
+
+    def last(self):
+        m  = self.db.getLastMatch()
+        return lastMatchMsg(m)

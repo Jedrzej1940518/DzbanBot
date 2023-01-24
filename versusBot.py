@@ -6,11 +6,11 @@ from messages import *
 import logging
 
 
-def prepAndGetCommandExecuter(channel, update=True):
+def prepAndGetCommandExecuter(channel, isPowerUser: bool):
     channelName = channel.name
     dbWrapper = DatabaseWrapper(channelName)
     dbUpdater = DatabaseUpdater(dbWrapper)
-    dbUpdater.updateDatabase()
+    dbUpdater.updateDatabase(isPowerUser)
 
     commandExecuter = CommandExecuter(channel, dbWrapper)
 
@@ -24,6 +24,9 @@ class Bot(commands.Bot):
         self.botOwner = botOwner
         super().__init__(token=authToken, prefix='!', initial_channels=self.initialChannels)
 
+    def isPowerUser(self, ctx: commands.Context):
+        return ctx.author.is_mod or ctx.author.is_broadcaster or (ctx.author.name == self.botOwner)
+
     async def event_ready(self):
 
         logging.info(f'Logged in as | {self.nick}')
@@ -35,16 +38,17 @@ class Bot(commands.Bot):
         if message.echo:
             return
 
-        await self.handle_commands(message)
+        try:
+            await self.handle_commands(message)
+
+        except Exception as e:
+            logging.error(e)
 
     @commands.command()
     async def versus(self, ctx: commands.Context):
 
-        try:
-            executer = prepAndGetCommandExecuter(ctx.channel)
-        except Exception as e:
-            logging.error(e)
-            return
+        executer = prepAndGetCommandExecuter(
+            ctx.channel, self.isPowerUser(ctx))
 
         splitted = ctx.message.content.split(' ')
         opponent = splitted[1]
@@ -54,66 +58,59 @@ class Bot(commands.Bot):
     @commands.command()
     async def dzisiaj(self, ctx: commands.Context):
 
-        try:
-            executer = prepAndGetCommandExecuter(ctx.channel)
-        except Exception as e:
-            logging.error(e)
-            return
+        executer = prepAndGetCommandExecuter(
+            ctx.channel, self.isPowerUser(ctx))
 
         await ctx.send(executer.dzisiaj())
 
     @commands.command()
     async def wczoraj(self, ctx: commands.Context):
 
-        try:
-            executer = prepAndGetCommandExecuter(ctx.channel)
-        except Exception as e:
-            logging.error(e)
-            return
+        executer = prepAndGetCommandExecuter(
+            ctx.channel, self.isPowerUser(ctx))
 
         await ctx.send(executer.wczoraj())
 
     @commands.command()
     async def dzisiaj_detale(self, ctx: commands.Context):
 
-        try:
-            executer = prepAndGetCommandExecuter(ctx.channel)
-        except Exception as e:
-            logging.error(e)
-            return
+        executer = prepAndGetCommandExecuter(
+            ctx.channel, self.isPowerUser(ctx))
 
         await ctx.send(executer.dzisiaj_detale())
 
     @commands.command()
     async def wczoraj_detale(self, ctx: commands.Context):
 
-        try:
-            executer = prepAndGetCommandExecuter(ctx.channel)
-        except Exception as e:
-            logging.error(e)
-            return
+        executer = prepAndGetCommandExecuter(
+            ctx.channel, self.isPowerUser(ctx))
 
         await ctx.send(executer.wczoraj_detale())
 
     @commands.command()
     async def punkty(self, ctx: commands.Context):
 
-        try:
-            executer = prepAndGetCommandExecuter(ctx.channel)
-        except Exception as e:
-            logging.error(e)
-            return
+        executer = prepAndGetCommandExecuter(
+            ctx.channel, self.isPowerUser(ctx))
 
         await ctx.send(executer.punkty())
 
     @commands.command()
+    async def last(self, ctx: commands.Context):
+
+        executer = prepAndGetCommandExecuter(
+            ctx.channel, self.isPowerUser(ctx))
+
+        await ctx.send(executer.last())
+
+    @commands.command()
     async def jutro(self, ctx: commands.Context):
         await ctx.send('Jutro będzie futro widzu LIKE')
-        
+
     @commands.command()
     async def konto(self, ctx: commands.Context):
 
-        if not (ctx.author.is_mod or ctx.author.is_broadcaster or (ctx.author.name == self.botOwner)):
+        if not self.isPowerUser(ctx):
             return
 
         try:
@@ -130,7 +127,7 @@ class Bot(commands.Bot):
             dbUpdater.updatePoints(newActiveAccount)
 
         except Exception as e:
-            await ctx.send(onFailedAccountSwap(newActiveAccount))
+            await ctx.send(onFailedAccountSwapMsg(newActiveAccount))
             logging.error(e)
             return
 

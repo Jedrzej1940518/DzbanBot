@@ -17,13 +17,13 @@ from collections import defaultdict
 class MatchHistoryObject:
 
     def __init__(self, row):
-        self.account_name = row[0]
-        self.end_date_time = row[1]
-        self.end_date = row[2]
-        self.enemy_name = row[3]
-        self.host_name = row[4]
-        self.duration_in_seconds = row[5]
-        self.rating_change = row[6]
+        self.account_name = row[0]  or ""
+        self.end_date_time = row[1] or ""
+        self.end_date = row[2]  or ""
+        self.enemy_name = row[3] or ""
+        self.host_name = row[4] or ""
+        self.duration_in_seconds = row[5] or 0
+        self.rating_change = row[6] or 0
 
 class DatabaseWrapper:
 
@@ -163,6 +163,12 @@ class DatabaseWrapper:
 
         return (points or 0, rank or 0)
 
+    def getLastMatch(self):
+        acc = self.getActiveAccount()
+        self.c.execute("""SELECT * FROM Match_History WHERE account_name = %s ORDER BY end_date_time DESC LIMIT 1""",(acc,))
+        row = self.c.fetchall()[0]
+        return MatchHistoryObject(row)
+    
     def addNewChannel(self):
 
         query = ("""INSERT INTO Internal_Data\

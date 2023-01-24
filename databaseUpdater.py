@@ -11,6 +11,7 @@ class DatabaseUpdater:
 
     __maxRangeToGet = 20
     __secondsBetweenUpdates = 300
+    __secondsBetweenUpdatesForPowerUsers=10
     
     def __init__(self, dbWrapper):
         self.dbWrapper = dbWrapper
@@ -86,17 +87,20 @@ class DatabaseUpdater:
         logging.info("NEW PROFILE ADDED - REMEMBER TO USE !konto")
         self.dbWrapper.addNewChannel()
         
-    def updateDatabase(self):
+    def updateDatabase(self, isPowerUser: bool = False):
 
         if not self.dbWrapper.channelExistsInDb():
             self.newProfile()
             return 
             
         t = self.__timePassedBetweenUpdates()
-            
-        if t.total_seconds() < self.__secondsBetweenUpdates:
+        
+        #power users can update DB more often but still 10 seconds break to prevent ddosing
+        if (not isPowerUser) and (t.total_seconds() < self.__secondsBetweenUpdates): 
             return
-
+        elif (isPowerUser) and (t.total_seconds() < self.__secondsBetweenUpdatesForPowerUsers):
+            return 
+        
         self.dbWrapper.updateWriteTime(datetime.datetime.now())
         activeAcount = self.dbWrapper.getActiveAccount()
         self.__updateMatchData(activeAcount)
