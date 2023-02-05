@@ -18,20 +18,20 @@ class CommandExecuter:
 
     def dzisiaj(self):
 
-        todaysDate = datetime.now().date()
+        todaysDate = datetime.datetime.now().date()
         [wins, loses, pointSum] = self.db.getWinsLosesPointsForDate(todaysDate)
 
         return todayMsg(self.accountName, wins, loses, pointSum)
 
     def wczoraj(self):
 
-        yesterdayDate = datetime.now().date() - timedelta(days = 1)
+        yesterdayDate = datetime.datetime.now().date() - timedelta(days = 1)
         [wins, loses, pointSum] = self.db.getWinsLosesPointsForDate(yesterdayDate)
 
         return yesterdayMsg(self.accountName, wins, loses, pointSum)
 
     def dzisiaj_detale(self):
-        todaysDate = datetime.now().date()
+        todaysDate = datetime.datetime.now().date()
         results = self.db.getDetailedDate(todaysDate)
         msg = ""
         for enemy_name, [wins, loses] in results.items():
@@ -39,7 +39,7 @@ class CommandExecuter:
         return msg
     
     def wczoraj_detale(self):
-        yesterdayDate = datetime.now().date() - timedelta(days = 1)
+        yesterdayDate = datetime.datetime.now().date() - timedelta(days = 1)
         results = self.db.getDetailedDate(yesterdayDate)
         msg = ""
         for enemy_name, [wins, loses] in results.items():
