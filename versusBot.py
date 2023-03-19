@@ -23,7 +23,12 @@ class Bot(commands.Bot):
 
     def __init__(self, botOwner, authToken, initialChannels):
         self._lastScrapping = datetime.datetime.now()
-        self._scrapped = scrapWebsite()
+        self._scrapped = None
+        try:
+            self._scrapped = scrapWebsite()
+        except:
+            pass
+        
         self.initialChannels = initialChannels
         self.botOwner = botOwner
         super().__init__(token=authToken, prefix='!', initial_channels=self.initialChannels)
@@ -143,13 +148,11 @@ class Bot(commands.Bot):
         now = datetime.datetime.now()
         t = now - self._lastScrapping
         
-        logging.info("pre scrap")
-        logging.info(self._scrapped)
-            
         if t.total_seconds() > 180 or self.isPowerUser(ctx): #minimum time between scrappnig
-            self._scrapped = scrapWebsite()
-        
-        logging.info("post scrap")
-        logging.info(self._scrapped)
+            self._lastScrapping = now
+            try:
+                self._scrapped = scrapWebsite()
+            except:
+                pass
             
         await ctx.send(moj_song(ctx.author.name, self._scrapped))

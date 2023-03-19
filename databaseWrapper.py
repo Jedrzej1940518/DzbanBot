@@ -13,6 +13,10 @@ from collections import defaultdict
 # match fieldnames = ['endDateTime', 'enemyName',
 #                      'hostName', 'durationInSeconds', 'ratingChange']
 
+dbHost = os.environ['DzbanBotDbHost']
+dbUser = os.environ['DzbanBotDbUser']
+dbPassword = os.environ['DzbanBotDbPassword']
+dbDatabase = os.environ['DzbanBotDbDatabase'] 
 
 class MatchHistoryObject:
 
@@ -29,8 +33,8 @@ class DatabaseWrapper:
 
     def __init__(self, channelName):
 
-        self.db = MySQLdb.connect(host="Jedrzej.mysql.pythonanywhere-services.com",
-                                  user="Jedrzej", password="7K7FvNy3b_fsAk@", database="Jedrzej$DzbanBot")
+        self.db = MySQLdb.connect(host=dbHost,
+                                  user=dbUser, password=dbPassword, database=dbDatabase)
         self.c = self.db.cursor()
         self.channelName = channelName
         pass

@@ -6,6 +6,8 @@ from messages import *
 
 def moj_song(user:str, dictionary):  
     
+    if dictionary == None:
+        return
     (song, time) = dictionary[user]
     
     (hours, remainder) = divmod(time.total_seconds(), 3600)
@@ -54,8 +56,6 @@ def scrapWebsite():
         (m,s) = time.split(':')
         result[user] = (song, time_sum)
         time_sum += datetime.timedelta(minutes=int(m), seconds = int(s))
-        
-        #print("song:", song, "user: ", user, "time: ", time)
 
     browser.quit()
     
