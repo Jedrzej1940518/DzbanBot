@@ -3,21 +3,21 @@ import datetime
 
 def today_msg(account_name, wins, loses, points):
     emote = emote_points(points)
-    return (f'Dzisiaj {account_name} wygrał {wins}, przegrał {loses}, punkty {points:+} {emote}')
+    return (f'Dzisiaj {account_name} {wins}-{loses} [{points:+}p.] {emote}')
 
 
 def yesterday_msg(account_name, wins, loses, points):
     emote = emote_points(points)
-    return (f'Wczoraj {account_name} wygrał {wins}, przegrał {loses}, punkty {points:+} {emote}')
+    return (f'Wczoraj {account_name} {wins}-{loses} [{points:+}p.] {emote}')
 
 
 def points_msg(account_name, points):
-    return (f'Punkty {account_name}: {points} peepo_blush')
+    return (f'Punkty {account_name}: {points} peepoBlush')
 
 
-def versus_msg(account_name, wins, loses, opponent):
+def versus_msg(account_name, wins, loses, points, opponent):
     emote = emote_wins(wins, loses)
-    return (f'{account_name} vs. {opponent}: wygranych {wins}, przegranych {loses} {emote}')
+    return (f'{account_name} vs. {opponent}: {wins}-{loses} [{points:+}p.] {emote}')
 
 
 def update_account_msg(new_active_account, points, rating):
@@ -25,11 +25,11 @@ def update_account_msg(new_active_account, points, rating):
 
 
 def on_failed_account_swap_msg(new_active_account):
-    return (f'Nie udało się przełączyć konta na {new_active_account} AYAYAS Wielkość liter ma znaczenie! Wpisałeś poprawnie? peepo_blush')
+    return (f'Nie udało się przełączyć konta na {new_active_account} AYAYAS Wielkość liter ma znaczenie! Wpisałeś poprawnie? peepoBlush')
 
 
 def detailed_match_msg(enemy_name, wins, loses):
-    return (f'{wins}-{loses} {enemy_name} {emote_wins(wins,loses)} ')
+    return (f'{wins}-{loses} {enemy_name}, ')
 
 
 def last_match_msg(match):
@@ -42,19 +42,19 @@ def last_match_msg(match):
     return (f'Ostatni mecz zakończył się: {hour}:{minutes} {wins}-{loses} {enemy_name} {emote_wins(wins,loses)} ')
 
 def negative_emote():
-    negative_emotes = ['classic', 'Pain', 'depresso',
-                      'xddinside', 'xdd_walk', 'PepeHands', 'AYAYAS']
+    negative_emotes = ['classic', 'Pain', 'depresso', 'Smadge', 'Weirdge','ApuApustaja', 
+                      'xddinside', 'xddWalk', 'PepeHands', 'AYAYAS']
     return random.choice(negative_emotes)
 
 
 def positive_emote():
-    positive_emotes = ['leosia_kiss', 'fifka', 'leosia_jam',
-                      'pajac', 'AYAYASmile', 'WICKED', 'PagMan']
+    positive_emotes = ['leosiaKiss', 'fifka', 'leosiaJAM', 'AYAYAHYPER', 'AYAYABASS',
+                      'pajac', 'AYAYASmile', 'WICKED', 'PagMan', 'AYAYALove']
     return random.choice(positive_emotes)
 
 
 def neutral_emote():
-    neutral_emotes = ['HUH', 'hmjj', 'AYAYAWeird']
+    neutral_emotes = ['HUH', 'hmjj', 'AYAYAWeird', 'Stare']
     return random.choice(neutral_emotes)
 
 

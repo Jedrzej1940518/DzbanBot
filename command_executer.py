@@ -22,8 +22,8 @@ class CommandExecuter:
         
         self._db_updater.update_database(self._power_user)
 
-        [wins, loses] = self._db.get_wins_loses_vs_opponent(opponent)
-        return versus_msg(self.account_name, wins, loses, opponent)
+        [wins, loses, points] = self._db.get_wins_loses_vs_opponent(opponent)
+        return versus_msg(self.account_name, wins, loses, points, opponent)
 
     def dzisiaj(self):
 
@@ -45,19 +45,23 @@ class CommandExecuter:
         
         self._db_updater.update_database(self._power_user)
         todays_date = datetime.now().date()
-        results = self._db.get_detailed_date(todays_date)
+        [results, points] = self._db.get_detailed_date(todays_date)
         msg = ""
         for enemy_name, [wins, loses] in results.items(): #todo add points
             msg += detailed_match_msg(enemy_name, wins, loses)
+        if msg != "":
+            msg += f"[{points:+}p.] " + emote_points(points)
         return msg
     
     def wczoraj_detale(self):
         self._db_updater.update_database(self._power_user)
         yesterday_date = datetime.now().date() - timedelta(days = 1)
-        results = self._db.get_detailed_date(yesterday_date)
+        [results, points] = self._db.get_detailed_date(yesterday_date)
         msg = ""
         for enemy_name, [wins, loses] in results.items(): #todo add poitns
             msg += detailed_match_msg(enemy_name, wins, loses)
+        if msg != "":
+            msg += f"[{points:+}p.] " + emote_points(points)
         return msg
         
     def konto(self, new_active_account):

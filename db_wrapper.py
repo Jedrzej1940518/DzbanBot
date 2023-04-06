@@ -110,7 +110,6 @@ class DatabaseWrapper:
 
     def get_wins_loses_vs_opponent(self, enemy_name):
 
-        #prevent injection
         acc = self.get_active_account()
         wins = self.__fetchOne(
             """SELECT COUNT(*) FROM Match_History WHERE account_name = %s AND enemy_name = %s AND rating_change>0""", (acc, enemy_name,))
@@ -118,7 +117,10 @@ class DatabaseWrapper:
         loses = self.__fetchOne(
             """SELECT COUNT(*) FROM Match_History WHERE account_name = %s AND enemy_name = %s AND rating_change<0""", (acc, enemy_name,))
 
-        return (wins or 0, loses or 0)
+        points = self.__fetchOne(
+            """SELECT SUM(rating_change) FROM Match_History WHERE account_name = %s AND enemy_name = %s""", (acc, enemy_name,))
+
+        return (wins or 0, loses or 0, points or 0)
 
     def get_wins_loses_points_for_date(self, date):  # TODO REFACTOR THIS
 
@@ -142,10 +144,12 @@ class DatabaseWrapper:
             """SELECT * FROM Match_History WHERE account_name = %s AND end_date = %s""", (acc, date))
 
         d = defaultdict(list) 
+        points = 0
 
         for row in self.c.fetchall():
             m = MatchHistoryObject(row)
-            d[m.enemy_name].append(m.rating_change )
+            d[m.enemy_name].append(m.rating_change)
+            points += m.rating_change
 
         res = {}
         
@@ -155,7 +159,7 @@ class DatabaseWrapper:
             loses = sum(1 if rating_change < 0 else 0 for rating_change in v)
             res[k] = (wins, loses)
                 
-        return res
+        return (res, points)
 
     def get_points_and_rank(self):
 
