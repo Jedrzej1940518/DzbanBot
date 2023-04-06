@@ -12,7 +12,7 @@ class CommandExecuter:
         self.channel = channel
         
     def versus(self, opponent):
-        
+
         [wins, loses] = self.db.getWinsLosesVsOpponent(opponent)
         return versusMsg(self.accountName, wins, loses, opponent)
 

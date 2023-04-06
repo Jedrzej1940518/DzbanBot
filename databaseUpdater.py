@@ -95,7 +95,7 @@ class DatabaseUpdater:
             
         t = self.__timePassedBetweenUpdates()
         
-        #power users can update DB more often but still 10 seconds break to prevent ddosing
+        #power users can update DB more often but still 10 seconds break to prevent pings
         if (not isPowerUser) and (t.total_seconds() < self.__secondsBetweenUpdates): 
             return
         elif (isPowerUser) and (t.total_seconds() < self.__secondsBetweenUpdatesForPowerUsers):

@@ -2,7 +2,6 @@ from twitchio.ext import commands
 from databaseWrapper import DatabaseWrapper
 from databaseUpdater import DatabaseUpdater
 from commandExecuter import CommandExecuter
-from songInfo import *
 from messages import *
 
 import datetime
@@ -18,16 +17,9 @@ def prepAndGetCommandExecuter(channel, isPowerUser: bool):
 
     return commandExecuter
 
-
 class Bot(commands.Bot):
 
     def __init__(self, botOwner, authToken, initialChannels):
-        self._lastScrapping = datetime.datetime.now()
-        self._scrapped = None
-        try:
-            self._scrapped = scrapWebsite()
-        except:
-            pass
         
         self.initialChannels = initialChannels
         self.botOwner = botOwner
@@ -141,18 +133,3 @@ class Bot(commands.Bot):
             return
 
         await ctx.send(executer.konto(newActiveAccount))
-
-    @commands.command()
-    async def moj_song(self, ctx: commands.Context):
-        
-        now = datetime.datetime.now()
-        t = now - self._lastScrapping
-        
-        if t.total_seconds() > 180 or self.isPowerUser(ctx): #minimum time between scrappnig
-            self._lastScrapping = now
-            try:
-                self._scrapped = scrapWebsite()
-            except:
-                pass
-            
-        await ctx.send(moj_song(ctx.author.name, self._scrapped))

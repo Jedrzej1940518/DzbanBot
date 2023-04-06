@@ -41,13 +41,6 @@ def lastMatchMsg(match):
 
     return (f'Ostatni mecz zakończył się: {hour}:{minutes} {wins}-{loses} {enemyName} {emoteWins(wins,loses)} ')
 
-def noSongForUserMsg(user: str):
-    return (f'Nie widze Twojego songa na liście {user} {neutralEmote()}')
-
-def songForUser(song: str, hours, minutes):
-    return (f'{song} będzie planowo grany za {hours}h {minutes}m {positiveEmote()}')
-
-
 def negativeEmote():
     negativeEmotes = ['classic', 'Pain', 'depresso',
                       'xddinside', 'xddWalk', 'PepeHands', 'AYAYAS']

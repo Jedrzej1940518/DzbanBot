@@ -1,5 +1,5 @@
 
-
+import os
 import MySQLdb
 import datetime
 from collections import defaultdict
@@ -112,6 +112,7 @@ class DatabaseWrapper:
 
     def getWinsLosesVsOpponent(self, enemyName):
 
+        #prevent injection
         acc = self.getActiveAccount()
         wins = self.__fetchOne(
             """SELECT COUNT(*) FROM Match_History WHERE account_name = %s AND enemy_name = %s AND rating_change>0""", (acc, enemyName,))
