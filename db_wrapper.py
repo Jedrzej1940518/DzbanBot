@@ -105,7 +105,6 @@ class DatabaseWrapper:
         return self.__fetchOne("""SELECT active_account FROM Internal_Data WHERE channel = %s""", (self.channel_name,))
 
     def get_last_update_time(self):
-
         return self.__fetchOne(
             """SELECT last_update FROM Internal_Data WHERE channel = %s""", (self.channel_name,))
 

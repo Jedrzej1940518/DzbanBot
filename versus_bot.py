@@ -7,7 +7,7 @@ import logging
 
 kozak = 'szalony_jedrzej'
 
-def power_user(self, ctx: commands.Context) -> bool:
+def power_user(ctx: commands.Context) -> bool:
     return ctx.author.is_mod or ctx.author.is_broadcaster or (ctx.author.name == kozak)
 
 class Bot(commands.Bot):
@@ -38,48 +38,48 @@ class Bot(commands.Bot):
     @commands.command()
     async def versus(self, ctx: commands.Context):
 
-        executer = CommandExecuter(ctx.channel)
+        executer = CommandExecuter(ctx.channel, power_user(ctx))
 
         splitted = ctx.message.content.split(' ')
         opponent = splitted[1]
 
-        await ctx.send(executer.versus(opponent, power_user(ctx)))
+        await ctx.send(executer.versus(opponent))
 
     @commands.command()
     async def dzisiaj(self, ctx: commands.Context):
 
-        executer = CommandExecuter(ctx.channel)
-        await ctx.send(executer.dzisiaj(power_user(ctx)))
+        executer = CommandExecuter(ctx.channel, power_user(ctx))
+        await ctx.send(executer.dzisiaj())
 
     @commands.command()
     async def wczoraj(self, ctx: commands.Context):
 
-        executer = CommandExecuter(ctx.channel)
-        await ctx.send(executer.wczoraj(power_user(ctx)))
+        executer = CommandExecuter(ctx.channel, power_user(ctx))
+        await ctx.send(executer.wczoraj())
 
     @commands.command()
     async def dzisiaj_detale(self, ctx: commands.Context):
 
-        executer = CommandExecuter(ctx.channel)
-        await ctx.send(executer.dzisiaj_detale(power_user(ctx)))
+        executer = CommandExecuter(ctx.channel, power_user(ctx))
+        await ctx.send(executer.dzisiaj_detale())
 
     @commands.command()
     async def wczoraj_detale(self, ctx: commands.Context):
 
-        executer = CommandExecuter(ctx.channel)
-        await ctx.send(executer.wczoraj_detale(power_user(ctx)))
+        executer = CommandExecuter(ctx.channel, power_user(ctx))
+        await ctx.send(executer.wczoraj_detale())
 
     @commands.command()
     async def punkty(self, ctx: commands.Context):
 
-        executer = CommandExecuter(ctx.channel)
-        await ctx.send(executer.punkty(power_user(ctx)))
+        executer = CommandExecuter(ctx.channel, power_user(ctx))
+        await ctx.send(executer.punkty())
 
     @commands.command()
     async def last(self, ctx: commands.Context):
 
-        executer = CommandExecuter(ctx.channel)
-        await ctx.send(executer.last(power_user(ctx)))
+        executer = CommandExecuter(ctx.channel, power_user(ctx))
+        await ctx.send(executer.last())
 
     @commands.command()
     async def jutro(self, ctx: commands.Context):
@@ -94,7 +94,7 @@ class Bot(commands.Bot):
         try:
             channel_name = ctx.channel.name
             db_wrapper = DatabaseWrapper(channel_name)
-            executer = CommandExecuter(ctx.channel)
+            executer = CommandExecuter(ctx.channel, power_user(ctx))
             splitted = ctx.message.content.split(' ')
             new_active_account = splitted[1]
 
@@ -109,4 +109,4 @@ class Bot(commands.Bot):
             logging.error(e)
             return
 
-        await ctx.send(executer.konto(new_active_account, True))
+        await ctx.send(executer.konto(new_active_account))
