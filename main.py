@@ -1,24 +1,27 @@
-import versusBot
+import versus_bot
 import sys
 import os
 import logging
 
-authToken = os.environ['authToken']
+twitch_token = os.environ['twitch_token']
 
-botOwner = 'szalony_jedrzej'
-initialChannels = ['Gluhammer']
-debugChannels = ['szalony_jedrzej']
+bot_owner = 'szalony_jedrzej'
+initial_channels = ['Gluhammer']
+debug_channels = ['szalony_jedrzej']
 
 
 def debug():
     logging.info("debugging start")
-    bot = versusBot.Bot(botOwner, authToken, debugChannels)
-    bot.run()
+    try:
+        bot = versus_bot.Bot(bot_owner, twitch_token, debug_channels)
+        bot.run()
+    except Exception as e:
+        logging.error(e)
 
 
 def release():
     logging.info("realse start")
-    bot = versusBot.Bot(botOwner, authToken, initialChannels)
+    bot = versus_bot.Bot(bot_owner, twitch_token, initial_channels)
     bot.run()
 
 

@@ -1,76 +1,76 @@
 import random
 import datetime
 
-def todayMsg(accountName, wins, loses, points):
-    emote = emotePoints(points)
-    return (f'Dzisiaj {accountName} wygrał {wins}, przegrał {loses}, punkty {points:+} {emote}')
+def today_msg(account_name, wins, loses, points):
+    emote = emote_points(points)
+    return (f'Dzisiaj {account_name} wygrał {wins}, przegrał {loses}, punkty {points:+} {emote}')
 
 
-def yesterdayMsg(accountName, wins, loses, points):
-    emote = emotePoints(points)
-    return (f'Wczoraj {accountName} wygrał {wins}, przegrał {loses}, punkty {points:+} {emote}')
+def yesterday_msg(account_name, wins, loses, points):
+    emote = emote_points(points)
+    return (f'Wczoraj {account_name} wygrał {wins}, przegrał {loses}, punkty {points:+} {emote}')
 
 
-def pointsMsg(accountName, points):
-    return (f'Punkty {accountName}: {points} peepoBlush')
+def points_msg(account_name, points):
+    return (f'Punkty {account_name}: {points} peepo_blush')
 
 
-def versusMsg(accountName, wins, loses, opponent):
-    emote = emoteWins(wins, loses)
-    return (f'{accountName} vs. {opponent}: wygranych {wins}, przegranych {loses} {emote}')
+def versus_msg(account_name, wins, loses, opponent):
+    emote = emote_wins(wins, loses)
+    return (f'{account_name} vs. {opponent}: wygranych {wins}, przegranych {loses} {emote}')
 
 
-def updateAccountMsg(newActiveAccount, points, rating):
-    return (f'Aktywne konto to teraz {newActiveAccount} - Punkty {points}, Top {rating} Hota AYAYASmile')
+def update_account_msg(new_active_account, points, rating):
+    return (f'Aktywne konto to teraz {new_active_account} - Punkty {points}, Top {rating} Hota AYAYASmile')
 
 
-def onFailedAccountSwapMsg(newActiveAccount):
-    return (f'Nie udało się przełączyć konta na {newActiveAccount} AYAYAS Wielkość liter ma znaczenie! Wpisałeś poprawnie? peepoBlush')
+def on_failed_account_swap_msg(new_active_account):
+    return (f'Nie udało się przełączyć konta na {new_active_account} AYAYAS Wielkość liter ma znaczenie! Wpisałeś poprawnie? peepo_blush')
 
 
-def detailedMatchMsg(enemyName, wins, loses):
-    return (f'{wins}-{loses} {enemyName} {emoteWins(wins,loses)} ')
+def detailed_match_msg(enemy_name, wins, loses):
+    return (f'{wins}-{loses} {enemy_name} {emote_wins(wins,loses)} ')
 
 
-def lastMatchMsg(match):
+def last_match_msg(match):
     wins = int(int(match.rating_change) > 0)
     loses = int(int(match.rating_change) < 0)
-    enemyName = match.enemy_name
+    enemy_name = match.enemy_name
     hour = match.end_date_time.hour
     minutes = match.end_date_time.minute
 
-    return (f'Ostatni mecz zakończył się: {hour}:{minutes} {wins}-{loses} {enemyName} {emoteWins(wins,loses)} ')
+    return (f'Ostatni mecz zakończył się: {hour}:{minutes} {wins}-{loses} {enemy_name} {emote_wins(wins,loses)} ')
 
-def negativeEmote():
-    negativeEmotes = ['classic', 'Pain', 'depresso',
-                      'xddinside', 'xddWalk', 'PepeHands', 'AYAYAS']
-    return random.choice(negativeEmotes)
+def negative_emote():
+    negative_emotes = ['classic', 'Pain', 'depresso',
+                      'xddinside', 'xdd_walk', 'PepeHands', 'AYAYAS']
+    return random.choice(negative_emotes)
 
 
-def positiveEmote():
-    positiveEmotes = ['leosiaKiss', 'fifka', 'leosiaJAM',
+def positive_emote():
+    positive_emotes = ['leosia_kiss', 'fifka', 'leosia_jam',
                       'pajac', 'AYAYASmile', 'WICKED', 'PagMan']
-    return random.choice(positiveEmotes)
+    return random.choice(positive_emotes)
 
 
-def neutralEmote():
-    neutralEmotes = ['HUH', 'hmjj', 'AYAYAWeird']
-    return random.choice(neutralEmotes)
+def neutral_emote():
+    neutral_emotes = ['HUH', 'hmjj', 'AYAYAWeird']
+    return random.choice(neutral_emotes)
 
 
-def emotePoints(points):
+def emote_points(points):
     if points > 0:
-        return positiveEmote()
+        return positive_emote()
     elif points < 0:
-        return negativeEmote()
+        return negative_emote()
     else:
-        return neutralEmote()
+        return neutral_emote()
 
 
-def emoteWins(wins, loses):
+def emote_wins(wins, loses):
     if wins > loses:
-        return positiveEmote()
+        return positive_emote()
     elif loses > wins:
-        return negativeEmote()
+        return negative_emote()
     else:
-        return neutralEmote()
+        return neutral_emote()
